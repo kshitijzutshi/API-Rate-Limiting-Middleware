@@ -1,0 +1,7 @@
+# .gitignore
+
+# Ignore the apitest directory
+/apitest/
+
+# Ignore all __pycache__ directories
+**/__pycache__/
