@@ -10,6 +10,14 @@ To make the code more scalable, you can consider the following improvements:
 
 5. Use a production-grade web server like Gunicorn or uWSGI instead of the built-in Flask development server.
 
+## 📁 api-scalability/middleware.py
+
+This file contains the `RateLimitMiddleware` class, a middleware that limits the rate at which clients can make requests to our API. It's initialized with a `limit` (the maximum number of requests a client can make within a certain time window) and a `per` parameter (the length of this time window in seconds).
+
+The `allow_request` method checks if a client (identified by their IP address) has exceeded the rate limit. If they have, the method returns `False`, indicating that the request should not be allowed. If they haven't, the method returns `True`, indicating that the request should be allowed.
+
+The `RateLimitMiddleware` class uses a dictionary to keep track of the number of requests each client has made and when they made their first request. This information is used to enforce the rate limit.
+
 Here's an example of how you can refactor the code to incorporate some of these improvements:
 
 ```python
