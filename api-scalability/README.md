@@ -18,97 +18,26 @@ The `allow_request` method checks if a client (identified by their IP address) h
 
 The `RateLimitMiddleware` class uses a dictionary to keep track of the number of requests each client has made and when they made their first request. This information is used to enforce the rate limit.
 
-Here's an example of how you can refactor the code to incorporate some of these improvements:
-
-```python
-# app.py
-from flask import Flask, request, jsonify
-from middleware import RateLimitMiddleware
-from validators import UserValidator
-from config import RATE_LIMIT, RATE_LIMIT_WINDOW
-from models import User
-
-app = Flask(__name__)
-app.wsgi_app = RateLimitMiddleware(app, limit=RATE_LIMIT, per=RATE_LIMIT_WINDOW)
-
-@app.route("/users", methods=["POST"])
-def create_user():
-    try:
-        data = request.json
-        validator = UserValidator(data)
-
-        if not validator.is_valid():
-            return jsonify({"error": validator.error_message}), 400
-
-        user = User(name=data["name"], age=data["age"])
-        user.save()
-
-        return jsonify(user.to_dict()), 201
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-if __name__ == '__main__':
-    app.run()
-```
-
-```python
-# config.py
-RATE_LIMIT = 10
-RATE_LIMIT_WINDOW = 60  # in seconds
-```
-
-```python
-# validators.py
-class UserValidator:
-    def __init__(self, data):
-        self.data = data
-        self.error_message = None
-
-    def is_valid(self):
-        if "name" not in self.data or "age" not in self.data:
-            self.error_message = "Name and age are required."
-            return False
-
-        if len(self.data["name"]) > 32:
-            self.error_message = "Name should be at most 32 characters long."
-            return False
-
-        try:
-            age = int(self.data["age"])
-            if age < 16:
-                self.error_message = "Age should be at least 16."
-                return False
-        except ValueError:
-            self.error_message = "Age should be a number."
-            return False
-
-        return True
-```
-
-```python
-# models.py
-class User:
-    def __init__(self, name, age):
-        self.name = name
-        self.age = age
-
-    def save(self):
-        # Save user data to a database or external storage
-        pass
-
-    def to_dict(self):
-        return {
-            "name": self.name,
-            "age": self.age
-        }
-```
-
-In this refactored code:
-
 - The rate limiting parameters are moved to a separate `config.py` file.
 - The validation logic is moved to a separate `UserValidator` class in `validators.py`.
 - A `User` model is introduced in `models.py` to handle user data storage and retrieval.
 - The `create_user` route focuses on handling the request, delegating validation and data storage to separate modules.
 
 These changes make the code more modular, maintainable, and scalable. You can further enhance it by using a production-grade web server and a robust database for storing user data.
+
+## 🔐 Authentication ways for the API endpoint
+
+There are several types of authentication you can implement on your API:
+
+- Basic Authentication: This is the simplest form of HTTP authentication. The client sends a base64-encoded string of the username and password with each request.
+
+- Token-Based Authentication: The client sends a token (usually in the Authorization header) with each request. The token is issued by the server after the client provides valid credentials.
+
+- API Key Authentication: The client sends an API key with each request. The API key is a unique identifier that is issued by the server.
+
+- OAuth: This is a standard protocol for authorization. It allows clients to access server resources on behalf of a resource owner (such as a user). It also allows the resource owner to authorize access to their resources without sharing their credentials.
+
+- JWT (JSON Web Tokens): This is a token-based authentication method where the token is a JSON object. The JSON object includes information (or claims) about the user. JWTs can be signed to ensure their integrity and can also be encrypted.
+
+- OpenID Connect: This is a simple identity layer on top of the OAuth 2.0 protocol. It allows clients to verify the identity of the user based on the authentication performed by an authorization server.
+
