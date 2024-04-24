@@ -41,3 +41,17 @@ There are several types of authentication you can implement on your API:
 
 - OpenID Connect: This is a simple identity layer on top of the OAuth 2.0 protocol. It allows clients to verify the identity of the user based on the authentication performed by an authorization server.
 
+# 🔐 API Key Authentication Integration
+
+In our Flask application, we have implemented API Key Authentication. This method involves the client sending an API key with each request, which acts as a unique identifier issued by the server.
+
+## 🚀 Implementation Details
+
+- **User Registration:** When a POST request is made to the `/users` endpoint with user data in the request body, the server generates a secure random API key for the user. This API key is then returned in the response.
+
+- **User Authentication:** When a GET request is made to the `/users` endpoint, the server expects an API key in the 'X-API-Key' header. If the API key is not provided or is invalid, the server returns an error. If the API key is valid, the server returns the user data associated with that key.
+
+- **Data Storage:** For simplicity, we're currently storing the user data and their associated API keys in a Python dictionary. In a real application, this data would be stored in a database.
+
+Please note that this is a basic implementation of API Key Authentication and is not suitable for a production environment. In a real application, you would need to implement additional security measures, such as encrypting the API keys and using HTTPS to protect the data in transit.
+
